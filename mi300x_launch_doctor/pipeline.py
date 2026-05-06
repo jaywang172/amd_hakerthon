@@ -7,7 +7,7 @@ from mi300x_launch_doctor.benchmark.results import load_benchmark
 from mi300x_launch_doctor.generator.dockerfile import generate_dockerfile
 from mi300x_launch_doctor.generator.requirements import generate_requirements
 from mi300x_launch_doctor.generator.vllm_script import generate_vllm_script
-from mi300x_launch_doctor.intake.inventory import build_inventory, filter_runtime_files, iter_scannable_files
+from mi300x_launch_doctor.intake.inventory import build_inventory, filter_runtime_files, iter_scannable_files, limit_scannable_files
 from mi300x_launch_doctor.intake.repo import cleanup_source, github_repo_name, is_github_url, prepare_source, prepare_uploaded_path
 from mi300x_launch_doctor.report.markdown import generate_markdown_report
 from mi300x_launch_doctor.scanner.scan_files import scan_files
@@ -70,8 +70,17 @@ def analyze_prepared_source(
 ) -> ScanResult:
     root = root.resolve()
     all_files = iter_scannable_files(root)
-    files, scan_scope = scoped_files(root, all_files, scan_mode)
-    inventory = build_inventory(root, source_label, repo_name, files, scan_scope=scan_scope)
+    scoped, scan_scope = scoped_files(root, all_files, scan_mode)
+    files, omitted_by_limit = limit_scannable_files(root, scoped)
+    inventory = build_inventory(
+        root,
+        source_label,
+        repo_name,
+        files,
+        scan_scope=scan_scope,
+        files_discovered=len(scoped),
+        files_omitted_by_limit=omitted_by_limit,
+    )
     risks = scan_files(root, files)
     score = score_readiness(inventory, risks)
     benchmark = load_benchmark(benchmark_json)

@@ -72,6 +72,16 @@ GRADIO_SERVER_PORT=7861 python app.py
 - `Runtime deployment scan`: default for demos and deployment readiness. It reduces docs/examples noise and focuses on dependency files, Docker files, serving entrypoints, runtime code, and CI workflow risks.
 - `Full repository audit`: exhaustive scan across all scannable files, useful as a stress test or for full migration discovery.
 
+## Stress-Test Behavior
+
+MI300X Launch Doctor is designed to stay responsive on small apps, medium repositories, and large AI framework repositories:
+
+- Skips common caches, build folders, model checkpoints, and binary artifacts.
+- Ignores files larger than 1 MB for static text scanning.
+- Prioritizes deployment-critical files when a repository has thousands of scannable files.
+- Reports `Files discovered in scope`, `Files scanned`, and `Files omitted by stress limit` in generated reports.
+- Keeps UI findings focused on the top deployment blockers while preserving full structured output in `scan_result.json`.
+
 ## Generated Output
 
 - `AMD_DEPLOYMENT_REPORT.md`

@@ -35,6 +35,9 @@ def main() -> int:
     print(f"ROCm Readiness Score: {result.score.score}/100")
     print(f"Label: {result.score.label}")
     print(f"Scan scope: {result.inventory.scan_scope}")
+    print(f"Files scanned: {result.inventory.files_scanned}")
+    if result.inventory.files_omitted_by_limit:
+        print(f"Files omitted by stress limit: {result.inventory.files_omitted_by_limit}")
     print(f"Risks: {len(result.risks)}")
     print(f"High risks: {severity_counts['high']}")
     print(f"Medium risks: {severity_counts['medium']}")

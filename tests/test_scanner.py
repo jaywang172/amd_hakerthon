@@ -16,3 +16,13 @@ def test_scanner_detects_cuda_dependency_docker_and_python_risks():
     assert "python.cuda_method" in rule_ids
     assert "dep.bitsandbytes" in rule_ids
     assert "dep.flash_attn" in rule_ids
+
+
+def test_vllm_dependency_is_reported_once_per_file(tmp_path):
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    (repo / "setup.py").write_text("vllm\nvllm\nvllm\n", encoding="utf-8")
+
+    risks = scan_files(repo, iter_scannable_files(repo))
+
+    assert [risk.rule_id for risk in risks].count("dep.vllm") == 1

@@ -18,6 +18,7 @@ def scan_files(root: Path, files: list[Path]) -> list[RiskItem]:
 
 def scan_text(rel_path: str, text: str) -> list[RiskItem]:
     risks: list[RiskItem] = []
+    seen_once_per_file_rules: set[str] = set()
     for line_no, line in enumerate(text.splitlines(), start=1):
         stripped = line.strip()
         if not stripped:
@@ -26,6 +27,9 @@ def scan_text(rel_path: str, text: str) -> list[RiskItem]:
             if not rule.applies_to(rel_path):
                 continue
             if rule.pattern.search(stripped):
+                if rule.rule_id == "dep.vllm" and rule.rule_id in seen_once_per_file_rules:
+                    continue
+                seen_once_per_file_rules.add(rule.rule_id)
                 risks.append(
                     RiskItem(
                         severity=rule.severity,

@@ -100,6 +100,9 @@ class RepoInventory:
     important_files: list[str]
     languages: list[str]
     frameworks: list[str]
+    files_discovered: int | None = None
+    files_omitted_by_limit: int = 0
+    scan_limit_applied: bool = False
     has_dockerfile: bool = False
     has_requirements: bool = False
     uses_pytorch: bool = False
@@ -112,6 +115,9 @@ class RepoInventory:
             "root_path": self.root_path,
             "scan_scope": self.scan_scope,
             "files_scanned": self.files_scanned,
+            "files_discovered": self.files_discovered,
+            "files_omitted_by_limit": self.files_omitted_by_limit,
+            "scan_limit_applied": self.scan_limit_applied,
             "important_files": self.important_files,
             "languages": self.languages,
             "frameworks": self.frameworks,

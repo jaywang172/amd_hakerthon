@@ -25,6 +25,8 @@ def generate_markdown_report(
             f"- Source: `{inventory.source}`",
             f"- Scan scope: {inventory.scan_scope}",
             f"- Files scanned: {inventory.files_scanned}",
+            f"- Files discovered in scope: {inventory.files_discovered if inventory.files_discovered is not None else inventory.files_scanned}",
+            f"- Files omitted by stress limit: {inventory.files_omitted_by_limit}",
             f"- Languages: {', '.join(inventory.languages) if inventory.languages else 'Unknown'}",
             f"- Frameworks: {', '.join(inventory.frameworks) if inventory.frameworks else 'Unknown'}",
             "",
@@ -36,8 +38,11 @@ def generate_markdown_report(
             "## Risk Summary",
             risk_summary_table(risks),
             "",
-            "## Major Risks",
-            risk_detail_section(risks),
+            "## Deployment Blockers",
+            risk_detail_section(deployment_blockers(risks)),
+            "",
+            "## Audit Context",
+            audit_context_section(risks),
             "",
             "## Score Notes",
             score_notes(score),
@@ -68,7 +73,7 @@ def risk_summary_table(risks: list[RiskItem]) -> str:
 
 def risk_detail_section(risks: list[RiskItem]) -> str:
     if not risks:
-        return "No major risks found."
+        return "No deployment blockers found in the selected scan scope."
     lines: list[str] = []
     ordered = sorted(risks, key=lambda risk: severity_rank(risk.severity))
     for index, risk in enumerate(ordered[:25], start=1):
@@ -85,6 +90,52 @@ def risk_detail_section(risks: list[RiskItem]) -> str:
     if len(risks) > 25:
         lines.append(f"\nAdditional findings omitted from report preview: {len(risks) - 25}")
     return "\n".join(lines)
+
+
+def deployment_blockers(risks: list[RiskItem]) -> list[RiskItem]:
+    return [risk for risk in risks if not is_audit_context(risk)]
+
+
+def audit_context_section(risks: list[RiskItem]) -> str:
+    context_risks = [risk for risk in risks if is_audit_context(risk)]
+    if not context_risks:
+        return "No documentation, test, example, or ROCm-platform context findings were separated from deployment blockers."
+    counts = Counter(context_label(risk) for risk in context_risks)
+    rows = ["| Context | Count |", "| --- | --- |"]
+    for label, count in sorted(counts.items()):
+        rows.append(f"| {label} | {count} |")
+    rows.append("")
+    rows.append("These findings remain useful during a full audit, but they are less likely to block the primary MI300X runtime deployment path.")
+    return "\n".join(rows)
+
+
+def is_audit_context(risk: RiskItem) -> bool:
+    path = risk.file.lower()
+    parts = path.split("/")
+    if parts[0] in {"docs", "doc", "documentation", "examples", "tests", "test", "benchmark", "benchmarks"}:
+        return True
+    if "/tests/" in path or "/examples/" in path or "/docs/" in path:
+        return True
+    if "readme" in path and path != "readme.md":
+        return True
+    if "rocm" in parts and risk.category in {"cuda_api", "native_cuda"}:
+        return True
+    if "rocm" in path and risk.file.endswith(('.py', '.cu', '.cpp', '.h', '.hpp')) and risk.category in {"cuda_api", "native_cuda"}:
+        return True
+    return False
+
+
+def context_label(risk: RiskItem) -> str:
+    path = risk.file.lower()
+    if "rocm" in path:
+        return "ROCm compatibility implementation"
+    if "readme" in path or path.startswith(("docs/", "doc/", "documentation/")) or "/docs/" in path:
+        return "Documentation"
+    if path.startswith(("tests/", "test/")) or "/tests/" in path:
+        return "Tests"
+    if path.startswith(("examples/", "benchmark/", "benchmarks/")) or "/examples/" in path:
+        return "Examples or benchmarks"
+    return "Other audit context"
 
 
 def score_notes(score: ScoreResult) -> str:

@@ -11,7 +11,7 @@ SEVERITY_PENALTIES = {
     "low": 3,
 }
 
-MAX_PENALTIES_PER_RULE = 2
+MAX_PENALTIES_PER_RULE = 3
 
 
 def score_readiness(inventory: RepoInventory, risks: list[RiskItem]) -> ScoreResult:

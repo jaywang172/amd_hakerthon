@@ -24,3 +24,18 @@ def test_mostly_ready_fixture_scores_high():
     score = score_readiness(inventory, risks)
 
     assert score.score >= 85
+
+
+def test_spread_runtime_cuda_risks_reduce_score_below_perfect(tmp_path):
+    repo = tmp_path / "repo"
+    (repo / "modules").mkdir(parents=True)
+    for index in range(4):
+        (repo / "modules" / f"gpu_{index}.py").write_text("import torch\nprint(torch.cuda.is_available())\n", encoding="utf-8")
+    (repo / "requirements.txt").write_text("torch\n", encoding="utf-8")
+
+    files = iter_scannable_files(repo)
+    inventory = build_inventory(repo, str(repo), repo.name, files)
+    risks = scan_files(repo, files)
+    score = score_readiness(inventory, risks)
+
+    assert score.score < 100
