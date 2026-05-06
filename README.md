@@ -7,6 +7,15 @@ sdk: gradio
 sdk_version: 6.14.0
 app_file: app.py
 pinned: false
+tags:
+  - amd
+  - amd-hackathon-2026
+  - rocm
+  - mi300x
+  - vllm
+  - gradio
+  - ai-agents
+  - mlops
 ---
 
 # MI300X Launch Doctor
