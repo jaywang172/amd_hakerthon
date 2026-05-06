@@ -1,0 +1,6 @@
+torch
+transformers
+bitsandbytes==0.43.1
+flash-attn==2.5.0
+xformers
+vllm
