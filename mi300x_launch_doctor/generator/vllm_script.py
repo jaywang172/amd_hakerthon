@@ -8,7 +8,8 @@ def generate_vllm_script() -> GeneratedFile:
 set -euo pipefail
 
 # Recommended inference path: vLLM on ROCm Docker
-MODEL_ID="${MODEL_ID:-Qwen/Qwen2.5-0.5B-Instruct}"
+MODEL_ID="${MODEL_ID:-Qwen/Qwen3.5-0.8B}"
+MAX_MODEL_LEN="${MAX_MODEL_LEN:-32768}"
 PORT="${PORT:-8000}"
 
 docker run --rm -it \\
@@ -19,8 +20,10 @@ docker run --rm -it \\
   --shm-size 8G \\
   -p "${PORT}:8000" \\
   vllm/vllm-openai-rocm:latest \\
-  --model "${MODEL_ID}" \\
+  vllm serve "${MODEL_ID}" \\
   --dtype bfloat16 \\
+  --max-model-len "${MAX_MODEL_LEN}" \\
+  --language-model-only \\
   --host 0.0.0.0 \\
   --port 8000
 """

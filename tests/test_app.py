@@ -40,7 +40,7 @@ def test_ui_shows_top_10_deployment_blockers_only():
 def test_ui_real_benchmark_json_changes_status(tmp_path):
     benchmark = tmp_path / "benchmark.json"
     benchmark.write_text(
-        '{"benchmark_mode":"real","model":"Qwen/Qwen2.5-0.5B-Instruct","backend":"vLLM ROCm","gpu":"AMD Instinct MI300X","load_success":true,"avg_latency_ms":742,"p50_latency_ms":690,"p95_latency_ms":1103,"tokens_per_second":68.4,"memory_used_gb":18.2}',
+        '{"benchmark_mode":"real","model":"Qwen/Qwen3.5-0.8B","backend":"vLLM ROCm","gpu":"AMD Instinct MI300X","load_success":true,"avg_latency_ms":742,"p50_latency_ms":690,"p95_latency_ms":1103,"tokens_per_second":68.4,"memory_used_gb":18.2}',
         encoding="utf-8",
     )
 

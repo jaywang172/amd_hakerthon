@@ -7,13 +7,13 @@ from typing import Any
 from mi300x_launch_doctor.schemas import BenchmarkResult
 
 
-SAMPLE_DISCLAIMER = "Sample benchmark format for demo. Replace with real AMD Developer Cloud output when available."
+SAMPLE_DISCLAIMER = "Sample benchmark format for demo using Qwen3.5-0.8B as the default MI300X/vLLM validation target. Replace with real AMD Developer Cloud output when available."
 
 
 def sample_benchmark() -> BenchmarkResult:
     return BenchmarkResult(
         benchmark_mode="sample",
-        model="Qwen/Qwen2.5-0.5B-Instruct",
+        model="Qwen/Qwen3.5-0.8B",
         backend="vLLM ROCm",
         gpu="AMD Instinct MI300X",
         load_success=True,

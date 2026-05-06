@@ -19,5 +19,11 @@ def test_generators_produce_rocm_vllm_content():
     assert "FROM rocm/pytorch:latest" in dockerfile
     assert "# bitsandbytes==0.43.1" in requirements
     assert "vllm/vllm-openai-rocm:latest" in script
+    assert "Qwen/Qwen3.5-0.8B" in script
+    assert 'vllm serve "${MODEL_ID}"' in script
+    assert 'MAX_MODEL_LEN="${MAX_MODEL_LEN:-32768}"' in script
+    assert '--max-model-len "${MAX_MODEL_LEN}"' in script
+    assert "--language-model-only" in script
     assert "--device=/dev/kfd" in script
+    assert benchmark.model == "Qwen/Qwen3.5-0.8B"
     assert benchmark.status_label == "Sample / Expected Format"

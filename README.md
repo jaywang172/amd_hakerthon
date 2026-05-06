@@ -13,6 +13,9 @@ tags:
   - rocm
   - mi300x
   - vllm
+  - qwen
+  - qwen3.5
+  - qwen3.5-0.8b
   - gradio
   - ai-agents
   - mlops
@@ -20,7 +23,7 @@ tags:
 
 # MI300X Launch Doctor
 
-MI300X Launch Doctor is an AI deployment readiness system for AMD ROCm and MI300X. Paste a GitHub repo, and it scans dependencies, Dockerfiles, Python GPU calls, and inference setup to produce a ROCm readiness score, risk report, generated deployment files, and optional vLLM benchmark summary.
+MI300X Launch Doctor is an AI deployment readiness system for AMD ROCm and MI300X. Paste a GitHub repo, and it scans dependencies, Dockerfiles, Python GPU calls, and inference setup to produce a ROCm readiness score, risk report, generated deployment files, and optional Qwen3.5 benchmark-ready vLLM summary.
 
 It is not a CUDA-to-ROCm translator. It is a deployment readiness and MLOps automation tool that helps teams answer: "Can this AI workload run on AMD, what must change, and how do we validate it?"
 
@@ -89,6 +92,18 @@ The generated vLLM script follows the ROCm inference path: using a ROCm-enabled 
 - `--ipc=host`
 - `--shm-size 8G`
 - `bfloat16`
+- `Qwen/Qwen3.5-0.8B` as the default benchmark target model
+- `--max-model-len 32768` by default for demo stability
+- `--language-model-only` to skip multimodal profiling and preserve KV cache for text validation
+
+
+## Qwen Integration
+
+MI300X Launch Doctor uses `Qwen/Qwen3.5-0.8B` as the default benchmark target model for generated AMD ROCm deployment scripts. Qwen3.5-0.8B is small enough for fast prototyping while still supporting modern serving stacks such as vLLM, SGLang, KTransformers, and Hugging Face Transformers.
+
+The project does not depend on live Qwen inference to run the scanner. Instead, Qwen is used as the default model target for AMD MI300X deployment validation through the generated `run_vllm_amd.sh` script and optional benchmark JSON workflow.
+
+The generated vLLM command uses a conservative `MAX_MODEL_LEN=32768` default even though Qwen3.5-0.8B supports a much longer native context window. This keeps the public demo and first MI300X validation pass stable; users can raise `MAX_MODEL_LEN` when memory budget allows.
 
 ## Benchmark Handling
 
