@@ -394,6 +394,8 @@ Tested cases:
 
 ## Architecture
 
+For a complete engineering view of the system, see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+
 ```text
 User
   |
